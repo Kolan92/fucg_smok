@@ -6,7 +6,7 @@ from validate_email import validate_email
 import schedule
 import time
 
-def job(token: str, percent: int, to: str, subject: str, body: str):
+def job(token: str, percent: int, receiver: str, subject: str, body: str):
     print("I'm working...")
     airly = AirlyClient(token, percent)
     hours = airly.get_hours_above_limit_in_next_day()
@@ -14,14 +14,14 @@ def job(token: str, percent: int, to: str, subject: str, body: str):
     message = "In the next 24h there will be {} hours with air pollution above {}% WHO limit".format(hours, percent)
     print(message)
 
-    if hours and to and validate_email(to):
+    if hours and receiver and validate_email(receiver):
         sender = OutlookSender()
         subject = subject if subject else "Air pollution will be above limit tomorrow"
         body = body if body else message
 
-        sender.send_email(to, subject, body)
+        sender.send_email(receiver, subject, body)
     else:
-        if (not to) or (not validate_email(to)):
+        if (not receiver) or (not validate_email(receiver)):
             print("Will not send an email, because receiver is not defined or in incorrect format")
         elif not hours:
             print("Will not send an email, because air quality is ok")
@@ -31,14 +31,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("token", type=str, help="airly token used to authenticate Airly API calls")
     parser.add_argument("--percent", "-p", type=int, help="percent threshold above which one raise alarm")
-    parser.add_argument("--to", "-t", type=str,  help="email's receiver")
+    parser.add_argument("--receiver", "-r", type=str,  help="email's receiver")
     parser.add_argument("--subject", "-s", type=str,  help="email's subject")
     parser.add_argument("--body", "-b", type=str,  help="email's body")
+    parser.add_argument("--time", "-t", type=str,  help="time when script should check forecast, default is 14:00")
     
     args = parser.parse_args()
     percent = args.percent if args.percent else 200
-    
-    schedule.every(10).seconds.do(job, token=args.token, percent=percent, to=args.to, subject=args.subject, body=args.body)
+    runTime = args.time if args.time else "14:00"
+
+    (schedule.every().day.at(runTime)
+        .do(job, token=args.token, percent=percent, receiver=args.receiver, subject=args.subject, body=args.body))
 
 
     while True:
