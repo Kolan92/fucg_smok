@@ -17,12 +17,16 @@ def main():
     
     airly = AirlyClient(args.token, percent)
     hours = airly.get_hours_above_limit_in_next_day()
+
     message = "In the next 24h there will be {} hours with air pollution above {}% WHO limit".format(hours, percent)
     print(message)
 
     if hours and args.to and validate_email(args.to):
         sender = OutlookSender()
-        sender.send_email()
+        subject = args.subject if args.subject else "Air pollution will be above limit tomorrow"
+        body = args.body if args.body else message
+
+        sender.send_email(args.to, subject, body)
     else:
         if (not args.to) or (not validate_email(args.to)):
             print("Will not send an email, because receiver is not defined or in incorrect format")
