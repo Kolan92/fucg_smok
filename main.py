@@ -3,8 +3,31 @@ from airly_client.airly_client import AirlyClient
 from mail_sender.outlook_sender import OutlookSender
 import argparse
 from validate_email import validate_email
+import schedule
+import time
+
+def job(token: str, percent: int, to: str, subject: str, body: str):
+    print("I'm working...")
+    airly = AirlyClient(token, percent)
+    hours = airly.get_hours_above_limit_in_next_day()
+
+    message = "In the next 24h there will be {} hours with air pollution above {}% WHO limit".format(hours, percent)
+    print(message)
+
+    if hours and to and validate_email(to):
+        sender = OutlookSender()
+        subject = subject if subject else "Air pollution will be above limit tomorrow"
+        body = body if body else message
+
+        sender.send_email(to, subject, body)
+    else:
+        if (not to) or (not validate_email(to)):
+            print("Will not send an email, because receiver is not defined or in incorrect format")
+        elif not hours:
+            print("Will not send an email, because air quality is ok")
 
 def main():
+
     parser = argparse.ArgumentParser()
     parser.add_argument("token", type=str, help="airly token used to authenticate Airly API calls")
     parser.add_argument("--percent", "-p", type=int, help="percent threshold above which one raise alarm")
@@ -15,23 +38,13 @@ def main():
     args = parser.parse_args()
     percent = args.percent if args.percent else 200
     
-    airly = AirlyClient(args.token, percent)
-    hours = airly.get_hours_above_limit_in_next_day()
+    schedule.every(10).seconds.do(job, token=args.token, percent=percent, to=args.to, subject=args.subject, body=args.body)
 
-    message = "In the next 24h there will be {} hours with air pollution above {}% WHO limit".format(hours, percent)
-    print(message)
 
-    if hours and args.to and validate_email(args.to):
-        sender = OutlookSender()
-        subject = args.subject if args.subject else "Air pollution will be above limit tomorrow"
-        body = args.body if args.body else message
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
-        sender.send_email(args.to, subject, body)
-    else:
-        if (not args.to) or (not validate_email(args.to)):
-            print("Will not send an email, because receiver is not defined or in incorrect format")
-        elif not hours:
-            print("Will not send an email, because air quality is ok")
 
     
 if __name__ == '__main__':
