@@ -21,8 +21,10 @@ def job(token: str, percent: int, receiver: str, subject: str, body: str):
 
         sender.send_email(receiver, subject, body)
     else:
-        if (not receiver) or (not validate_email(receiver)):
-            print("Will not send an email, because receiver is not defined or in incorrect format")
+        if not receiver:
+            print("Will not send an email, because receiver is not defined")
+        if not validate_email(receiver):
+            print("Will not send an email, because receiver email is malformed: {}".format(receiver))
         elif not hours:
             print("Will not send an email, because air quality is ok")
 
@@ -35,10 +37,12 @@ def main():
     parser.add_argument("--subject", "-s", type=str,  help="email's subject")
     parser.add_argument("--body", "-b", type=str,  help="email's body")
     parser.add_argument("--time", "-t", type=str,  help="time when script should check forecast, default is 14:00")
-    
+
     args = parser.parse_args()
     percent = args.percent if args.percent else 200
     runTime = args.time if args.time else "14:00"
+
+    print("Periodic check of air quality will run every day at {}".format(runTime))
 
     (schedule.every().day.at(runTime)
         .do(job, token=args.token, percent=percent, receiver=args.receiver, subject=args.subject, body=args.body))
@@ -49,6 +53,6 @@ def main():
         time.sleep(1)
 
 
-    
+
 if __name__ == '__main__':
     main()

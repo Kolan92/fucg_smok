@@ -27,12 +27,12 @@ optional arguments:
                         email's subject
   --body BODY, -b BODY  email's body
   --time TIME, -t TIME  time when script should check forecast, default is 14:00
-``` 
+```
 
 Example use:
 
 ```
-python main.py token -p 150 -r dupa@dupa.pl -s 'HO for the tomorrow' -b 'Due to hostile conditions I will work from home tomorrow -t 13:00'
+python main.py token -p 150 -r test@test.pl -s 'HO for the tomorrow' -b 'Due to hostile conditions I will work from home tomorrow' -t '13:00'
 ```
 
 ### Future plans
