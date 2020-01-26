@@ -11,7 +11,7 @@ Arguments can be checked with `python main.py -h`
 
 ```
 usage: main.py [-h] [--percent PERCENT] [--receiver RECEIVER]
-               [--subject SUBJECT] [--body BODY] [--time TIME]
+               [--subject SUBJECT] [--body BODY] [--time TIME] [--now NOW]
                token
 
 positional arguments:
@@ -26,7 +26,9 @@ optional arguments:
   --subject SUBJECT, -s SUBJECT
                         email's subject
   --body BODY, -b BODY  email's body
-  --time TIME, -t TIME  time when script should check forecast, default is 14:00
+  --time TIME, -t TIME  time when script should check forecast, default is
+                        14:00
+  --now NOW, -n NOW     executes once and exit the script
 ```
 
 Example use:
@@ -42,5 +44,3 @@ Plans how to enhance functionalities of this script:
 1. Add possibility to register as windows service, and schedule check
 2. Remove hardcoded Cracow's location in airly request
 3. Add more email providers
-
-

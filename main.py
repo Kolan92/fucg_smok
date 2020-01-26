@@ -37,10 +37,15 @@ def main():
     parser.add_argument("--subject", "-s", type=str,  help="email's subject")
     parser.add_argument("--body", "-b", type=str,  help="email's body")
     parser.add_argument("--time", "-t", type=str,  help="time when script should check forecast, default is 14:00")
+    parser.add_argument("--now", "-n", type=bool,  help="executes once and exit the script")
 
     args = parser.parse_args()
     percent = args.percent if args.percent else 200
     runTime = args.time if args.time else "14:00"
+
+    if args.now:
+        job(args.token, percent, args.receiver, args.subject, args.body)
+        return
 
     print("Periodic check of air quality will run every day at {}".format(runTime))
 

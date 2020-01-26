@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+
+[packages]
+pep8 = "==1.7.1"
+pylint = "==2.4.4"
+requests = "==2.21.0"
+requests-unixsocket = "==0.1.5"
+schedule = "==0.6.0"
+validate_email = "==1.3"
+
+[requires]
+python_version = "3.8"

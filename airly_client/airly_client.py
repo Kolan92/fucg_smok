@@ -11,16 +11,18 @@ class AirlyClient:
         response = session.get(self._url, headers={'Accept': 'application/json', 'apikey': self._token })
         
         if response.status_code != 200:
-            print('Cant obtain forecast data')
+            print("Cant obtain forecast data")
             return None
         
         forecast = response.json()['forecast']
-        standards = [f for f in forecast 
-            if any(p > self._percent for p in map(lambda x: x['percent'], f['standards']))]
+        standards = [f for f in forecast if self.above_limit(f)]
 
         print(standards)
         print('\n\n\n')
         return len(standards)
+
+    def above_limit(self, f) -> bool:
+        return any(p > self._percent for p in map(lambda x: x['percent'], f['standards']))
         
 
 
